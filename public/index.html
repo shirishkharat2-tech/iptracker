@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IP Tracker — Network VLAN Manager</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════════════════════════ -->
+<header id="appHeader">
+  <div class="header-left">
+    <!-- Back button — only shown in VLAN detail view -->
+    <button class="btn-back" id="backBtn" style="display:none">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      VLANs
+    </button>
+
+    <div class="logo">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <rect x="2" y="3" width="20" height="14" rx="2"/>
+        <path d="M8 21h8M12 17v4"/>
+        <circle cx="6" cy="10" r="1" fill="currentColor"/>
+        <circle cx="10" cy="10" r="1" fill="currentColor"/>
+      </svg>
+      <span class="logo-text">IP Tracker</span>
+      <span class="logo-sub">Network VLAN Manager</span>
+    </div>
+
+    <!-- Breadcrumb — shown in detail view -->
+    <div class="breadcrumb" id="breadcrumb" style="display:none">
+      <span class="bc-sep">/</span>
+      <span class="bc-vlan" id="bcVlan">—</span>
+    </div>
+  </div>
+
+  <div class="header-actions">
+    <button class="btn btn-ghost btn-sm" id="settingsBtn" title="Scan Settings">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      Settings
+    </button>
+    <button class="btn btn-secondary btn-sm" id="exportBtn">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Export CSV
+    </button>
+    <!-- Assign IP only shown in detail view -->
+    <button class="btn btn-primary btn-sm" id="headerAddBtn" style="display:none">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Assign IP
+    </button>
+  </div>
+</header>
+
+<!-- ════════════════════════════════════════════════════════════════
+     VIEW 1 — DASHBOARD  (VLAN list)
+═══════════════════════════════════════════════════════════════ -->
+<div id="viewDashboard" class="view">
+
+  <div class="container">
+
+    <!-- Global stats -->
+    <div class="stats-bar" id="statsBar">
+      <div class="stat-card skeleton"></div>
+      <div class="stat-card skeleton"></div>
+      <div class="stat-card skeleton"></div>
+      <div class="stat-card skeleton"></div>
+      <div class="stat-card skeleton"></div>
+    </div>
+
+    <!-- VLAN list heading -->
+    <div class="section-header">
+      <div class="section-title">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:6px">
+          <rect x="2" y="7" width="20" height="14" rx="2"/>
+          <path d="M16 3H8"/><path d="M12 3v4"/>
+        </svg>
+        Select a VLAN to view its IPs
+      </div>
+      <div class="search-wrap">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="search" id="vlanSearch" placeholder="Search VLANs…" />
+      </div>
+    </div>
+
+    <!-- VLAN cards grid -->
+    <div class="vlan-grid" id="vlanGrid"></div>
+
+  </div>
+</div><!-- /viewDashboard -->
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     VIEW 2 — VLAN DETAIL
+═══════════════════════════════════════════════════════════════ -->
+<div id="viewDetail" class="view" style="display:none">
+
+  <div class="container">
+
+    <!-- ── VLAN info hero bar ─────────────────────────────────── -->
+    <div class="vlan-hero" id="vlanHero"></div>
+
+    <!-- ── Ping / Scan Panel ──────────────────────────────────── -->
+    <div class="scan-panel" id="scanPanel">
+      <div class="scan-header">
+        <div>
+          <div class="scan-title">Network Scan</div>
+          <div class="scan-meta" id="scanMeta">No scan data yet — click Scan to begin.</div>
+        </div>
+        <div class="scan-header-controls">
+          <button class="btn btn-scan" id="scanBtn">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>
+            </svg>
+            <span id="scanBtnText">Scan / Ping All IPs</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="scan-progress-wrap" id="scanProgressWrap" style="display:none">
+        <div class="scan-progress-header">
+          <span id="scanProgressLabel">Scanning…</span>
+          <span id="scanProgressCount" class="scan-progress-count">0 / 0</span>
+        </div>
+        <div class="scan-progress-track">
+          <div class="scan-progress-fill" id="scanProgressFill" style="width:0%"></div>
+        </div>
+        <div class="scan-live-stats">
+          <span class="sls sls-used">🔴 <span id="liveUsed">0</span> used</span>
+          <span class="sls sls-timeout">🟡 <span id="liveTimeout">0</span> timeout</span>
+          <span class="sls sls-spare">🟢 <span id="liveSpare">0</span> spare</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── IP Table Panel ─────────────────────────────────────── -->
+    <div class="detail-panel" id="detailPanel">
+
+      <div class="detail-header">
+        <div>
+          <div class="detail-title" id="detailTitle">—</div>
+          <div class="detail-meta" id="detailMeta">—</div>
+        </div>
+        <div class="detail-controls">
+          <div class="view-toggle">
+            <button class="view-btn active" id="viewTableBtn">Table</button>
+            <button class="view-btn" id="viewGridBtn">Grid</button>
+          </div>
+          <div class="filter-tabs" id="filterTabs"></div>
+          <div class="search-wrap">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input type="search" id="ipSearch" placeholder="Search IPs, hostname…" />
+          </div>
+          <button class="btn btn-primary btn-sm" id="detailAddBtn">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Assign IP
+          </button>
+        </div>
+      </div>
+
+      <!-- Subnet info strip -->
+      <div class="subnet-info" id="subnetInfo"></div>
+
+      <!-- Legend -->
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#f87171"></div>Used (reply received)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Timeout (no reply)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>Spare (host unreachable)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#7c5cfc"></div>Reserved</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#4f8ef7"></div>Gateway / Network</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Broadcast</div>
+      </div>
+
+      <!-- IP content (table or grid) -->
+      <div id="detailContent"></div>
+
+    </div><!-- /detail-panel -->
+
+  </div>
+</div><!-- /viewDetail -->
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     MODALS
+═══════════════════════════════════════════════════════════════ -->
+
+<!-- Assign IP -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Assign IP Address</div>
+      <button class="btn-icon" id="modalClose">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">VLAN *</label>
+          <select id="fVlan" class="form-control"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">IP Address *</label>
+          <input type="text" id="fIp" class="form-control" placeholder="e.g. 192.168.10.5" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Hostname / Device</label>
+          <input type="text" id="fHost" class="form-control" placeholder="e.g. XBRL-PC-01" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select id="fStatus" class="form-control">
+            <option value="used">Used</option>
+            <option value="reserved">Reserved</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Device Type</label>
+          <select id="fType" class="form-control">
+            <option value="">— Select —</option>
+            <option>Workstation</option><option>Server</option>
+            <option>Printer</option><option>Network Device</option>
+            <option>IP Phone</option><option>Camera</option>
+            <option>IoT Device</option><option>Laptop</option>
+            <option>Mobile</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">MAC Address</label>
+          <input type="text" id="fMac" class="form-control" placeholder="AA:BB:CC:DD:EE:FF" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea id="fNotes" class="form-control" rows="2" placeholder="Optional notes…"></textarea>
+      </div>
+      <div class="form-error" id="formError"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="modalCancel">Cancel</button>
+      <button class="btn btn-primary" id="modalSave">Save Assignment</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header">
+      <div class="modal-title">Scan Settings</div>
+      <button class="btn-icon" id="settingsModalClose">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Ping Timeout (ms)</label>
+        <input type="number" id="sPingTimeout" class="form-control" min="500" max="10000" step="100" />
+        <div class="form-hint">Time to wait for each ping response. Default: 1500 ms.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Concurrency (parallel pings)</label>
+        <input type="number" id="sConcurrency" class="form-control" min="1" max="100" />
+        <div class="form-hint">How many IPs to ping simultaneously. Default: 30. Routed VLANs use at most 3 parallel probes, at least 3000 ms timeout and 2 retries to allow delayed gateway replies.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ping Retries</label>
+        <input type="number" id="sPingRetries" class="form-control" min="0" max="5" />
+        <div class="form-hint">Extra attempts before marking as timeout/spare. Default: 1.</div>
+      </div>
+      <div class="form-error" id="settingsError"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="settingsCancel">Cancel</button>
+      <button class="btn btn-primary" id="settingsSave">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer"></div>
+<script src="app.js"></script>
+</body>
+</html>
