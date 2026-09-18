@@ -1,0 +1,105 @@
+/* Shopeers-inspired analytics workspace: bright surfaces and a blue accent. */
+:root,:root[data-theme=light] { --bg:#f3f5f9;--surface:#fff;--surface2:#f0f3fa;--border:#e7eaf0;--accent:#3559ed;--accent2:#2849d6;--text:#171c2a;--muted:#768092;--shadow:0 3px 16px #1c315007; }
+:root[data-theme=dark] { --bg:#111621;--surface:#1a2230;--surface2:#242e40;--border:#303b50;--accent:#7894ff;--text:#edf1fa;--muted:#a0aec5; }
+:root[data-theme=ocean] { --bg:#0c202b;--surface:#12303e;--surface2:#1c4050;--border:#2a5262;--accent:#59c4e0;--text:#e5f4fa;--muted:#9fbdca; }
+body { padding-left:224px; }
+.workspace-sidebar { width:224px;background:var(--surface);border-color:var(--border);padding-top:24px; }
+.brand-symbol { background:var(--accent);color:white;transform:rotate(-8deg); }
+.workspace-brand { font-size:18px; }
+.workspace-sidebar button { border-radius:8px;min-height:39px;margin-bottom:3px; }
+.workspace-sidebar button.selected { color:var(--accent);background:var(--surface2);box-shadow:inset 3px 0 var(--accent);font-weight:600; }
+.sidebar-section-label { margin-top:24px; }
+.sidebar-footer { border-top:1px solid var(--border);margin-top:auto;padding-top:18px; }
+#appHeader { background:var(--surface);min-height:72px; }
+#appHeader .logo-text { color:var(--text);font-weight:600; }
+.btn-primary,.btn-scan { background:var(--accent);border-color:var(--accent);color:#fff;border-radius:9px; }
+.btn-primary:hover,.btn-scan:hover { background:var(--accent2); }
+.btn-secondary,.btn-ghost,.theme-choice { border-radius:8px; }
+.container { padding:28px 30px; }
+#viewDashboard>.container { display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px; }
+#viewDashboard .overview-heading { grid-column:1/-1;order:0;padding:0; }
+#viewDashboard .stats-bar { grid-column:1/-1;order:1; }
+.allocation-panel { grid-column:1;order:2; }
+#networkInsights { grid-column:2;order:2;display:flex;flex-direction:column;justify-content:center;gap:22px;padding:30px; }
+#viewDashboard .operations-grid { grid-column:1/-1;order:3; }
+#viewDashboard .section-header { grid-column:1/-1;order:4; }
+#viewDashboard .dashboard-tools { grid-column:1/-1;order:5; }
+#viewDashboard .vlan-grid { grid-column:1/-1;order:6; }
+h1 { font-size:30px;font-weight:650;letter-spacing:-.9px;line-height:1.3;margin:6px 0 8px; }
+.eyebrow { font-size:10px;letter-spacing:1px;color:var(--accent); }
+.overview-heading p { font-size:14px; }
+.time-panel { margin-left:auto;display:flex;flex-direction:column;gap:7px;text-align:right; }
+#aitClock { font-size:14px;font-weight:600;white-space:nowrap; }
+#timeSource { font-size:11px;color:var(--muted); }
+.update-chip { display:none; }
+.stats-bar { gap:14px;border:0;background:transparent;overflow:visible; }
+.stat-card { background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:var(--shadow); }
+.stat-card:last-child { border-right:1px solid var(--border); }
+.stat-label { color:var(--muted);font-weight:500;font-size:13px; }
+.stat-value { font-size:30px;margin:8px 0 4px;font-weight:650; }
+.stat-sub { font-size:12px; }
+.stat-card:nth-child(5) .stat-value { color:var(--accent)!important; }
+.network-insights,.allocation-panel { border-radius:15px;border:1px solid var(--border);background:var(--surface);box-shadow:var(--shadow); }
+.allocation-panel { padding:22px; }
+.allocation-heading { display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px; }
+.allocation-heading h2 { font-size:16px;font-weight:650; }
+.allocation-heading p { font-size:12px;color:var(--muted);margin-top:4px; }
+.chart-key { font-size:11px;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:6px; }
+.chart-key i { width:8px;height:8px;background:var(--accent);border-radius:2px; }
+#allocationChart { display:grid;gap:5px; }
+.allocation-row { display:grid;grid-template-columns:100px minmax(0,1fr) 76px;align-items:center;gap:12px;width:100%;border:0;background:transparent;color:var(--text);font:inherit;font-size:12px;text-align:left;cursor:pointer;padding:4px 0; }
+.allocation-row:hover { background:var(--surface2);border-radius:4px; }
+.allocation-track { height:8px;background:var(--surface2);border-radius:3px;overflow:hidden; }
+.allocation-track i { display:block;height:100%;background:var(--accent);border-radius:3px; }
+.allocation-count { font-size:11px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums; }
+#networkInsights>div:first-child { flex-wrap:wrap;gap:12px; }
+#networkInsights .eyebrow { width:100%;font-size:13px;letter-spacing:0;color:var(--text); }
+#networkInsights strong { font-size:52px;letter-spacing:-2px;font-weight:600; }
+#networkInsights p { font-size:13px;line-height:1.7;border-top:1px solid var(--border);padding-top:20px; }
+#networkInsights .coverage-track { height:9px;margin:0; }
+.operation-card { padding:22px; }
+.operation-card strong { font-size:16px; }
+.dashboard-tools { border:0;padding:0; }
+.dashboard-tools select { background:var(--surface); }
+.vlan-card { border-radius:13px;background:var(--surface);box-shadow:var(--shadow); }
+.vc-stripe { height:3px;opacity:.8; }
+.vc-ping { border-top:1px solid var(--border); }
+.vc-subnet { background:var(--surface2);border-radius:6px;padding:7px 9px;color:var(--accent); }
+.vc-freshness { font-size:11px; }
+.vc-stat { font-size:12px; }
+.table-wrap th { background:var(--surface2); }
+.detail-panel,.vlan-hero,.scan-panel { border-radius:14px; }
+@media(max-width:1200px) { body{padding-left:196px;}.workspace-sidebar{width:196px;}.container{padding:24px;}#viewDashboard>.container{grid-template-columns:1fr;}.allocation-panel,#networkInsights{grid-column:1;}#networkInsights{gap:12px;padding:22px;}.allocation-heading{flex-wrap:wrap;}.stats-bar{grid-template-columns:repeat(3,minmax(0,1fr));}.stat-card:last-child{grid-column:auto;}.time-panel{margin-left:0;}.overview-heading{flex-wrap:wrap;} }
+@media(max-width:800px) { body{padding-left:0;}.workspace-sidebar{width:100%;}.container{padding:20px 16px;}.time-panel{text-align:left;}.stats-bar{grid-template-columns:repeat(2,minmax(0,1fr));}.stat-card:last-child{grid-column:1/-1;}.overview-heading{gap:14px;}.allocation-panel{padding:18px;} }
+@media(max-width:480px) { h1{font-size:26px;}.allocation-row{grid-template-columns:78px minmax(0,1fr) 65px;gap:8px;font-size:11px;}.chart-key{display:none;}.stat-card{padding:16px;}.stat-value{font-size:27px;} }
+
+/* Simple operations dashboard polish */
+body{background:#f4f6f9;color:#1d2735;padding-left:220px}.workspace-sidebar{width:220px;background:#182536;border-color:#26384e;padding:24px 14px;color:#d9e2ef}.workspace-sidebar button{border-radius:7px;min-height:38px}.workspace-sidebar button.selected{color:#fff;background:#294a78;box-shadow:inset 3px 0 #3767d8}.sidebar-section-label{color:#8194ac}.container{padding:26px 30px;max-width:1420px}.overview-heading{padding:0}.overview-heading h1{font-size:28px}.network-insights,.allocation-panel,.stat-card,.vlan-card,.detail-panel,.vlan-hero,.scan-panel{border-radius:10px;box-shadow:0 2px 10px rgba(24,45,76,.06)}#viewDashboard>.container{display:grid;grid-template-columns:1fr;gap:18px}.stats-bar{gap:12px}.stat-card{padding:17px}.stat-label{font-size:11px}.stat-value{font-size:28px}.allocation-panel{padding:20px}.allocation-row{padding:5px 6px}.allocation-track{height:7px}.operations-grid{gap:16px}.operation-card{padding:20px}.dashboard-tools select,.search-wrap input{border-radius:7px}.vc-subnet{border-radius:5px}.detail-panel,.vlan-hero,.scan-panel{background:#fff}
+@media(max-width:1200px){body{padding-left:0}.workspace-sidebar{width:100%}.stats-bar{grid-template-columns:repeat(3,minmax(0,1fr))}.operations-grid{grid-template-columns:1fr}}
+
+/* 21st.dev-inspired product polish: clear tokens, restrained depth, and focused actions. */
+:root{--accent:#2563eb;--accent2:#1d4ed8;--surface:#ffffff;--surface2:#f8fafc;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;--shadow:0 8px 24px rgba(15,23,42,.06)}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:linear-gradient(135deg,#f8fafc 0%,#eef3f9 100%)}
+#appHeader{box-shadow:0 1px 0 var(--border);padding-left:30px;padding-right:30px}.logo-text{font-weight:700;letter-spacing:-.2px}.logo-sub{color:var(--muted)}
+.btn{font-weight:600;transition:transform .15s ease,box-shadow .15s ease}.btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.18)}.btn-primary,.btn-scan{background:linear-gradient(135deg,#2563eb,#1d4ed8)}
+.container{padding-top:32px}.overview-heading{margin-bottom:2px}.overview-heading h1{font-weight:750;letter-spacing:-.8px}.overview-heading p{margin-top:5px}.stat-card{transition:transform .15s ease,box-shadow .15s ease}.stat-card:hover,.vlan-card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(15,23,42,.09)}
+.network-insights,.allocation-panel{box-shadow:var(--shadow)}.operation-card{min-height:128px}.all-scan-heading{align-items:flex-start}.vlan-grid{gap:16px}.vlan-card{transition:transform .15s ease,box-shadow .15s ease}.section-title{font-weight:650;color:var(--text)}
+
+/* Corporate dashboard layout */
+:root{--bg:#f5f7fb;--surface:#fff;--surface2:#f8fafc;--border:#dce3ed;--accent:#1f5fd1;--accent2:#1649aa;--text:#172033;--muted:#68768a;--shadow:0 2px 8px rgba(17,32,58,.06)}
+body{background:var(--bg);font-size:13px}.workspace-sidebar{background:#101c2d;width:224px;padding:22px 14px}.workspace-brand{border-bottom:1px solid #26364d;padding:0 8px 20px;margin-bottom:18px;color:#f4f7fb}.workspace-brand small{color:#8fa2bb}.workspace-sidebar button{height:38px;color:#aebed2;font-size:13px}.workspace-sidebar button.selected{background:#1d477e;color:#fff;box-shadow:none}.sidebar-section-label{font-size:10px;margin:22px 8px 8px;color:#7489a4}.workspace-vlans button{height:34px;font-size:12px}.sidebar-footer{font-size:12px;color:#bdc9d8}
+#appHeader{height:68px;min-height:68px;padding:0 28px;background:#fff;border-bottom:1px solid var(--border)}.header-actions{gap:8px}.header-actions .btn,.theme-choice{height:34px;font-size:12px}.logo{gap:8px}.logo-text{font-size:16px}.logo-sub{font-size:11px}
+.container{padding:28px 30px 42px;max-width:1500px}.overview-heading{border-bottom:1px solid var(--border);padding-bottom:22px;margin-bottom:0}.overview-heading h1{font-size:26px;font-weight:700;color:#111b2e}.overview-heading p{font-size:13px}.time-panel{font-size:12px}
+.stats-bar{grid-template-columns:repeat(5,1fr);gap:12px;margin:0}.stat-card{border-radius:8px;padding:16px 18px;border:1px solid var(--border);min-height:100px}.stat-label{font-size:10px;letter-spacing:.7px}.stat-value{font-size:27px;color:#15243b!important}.stat-card:nth-child(2) .stat-value{color:#1b8b5b!important}.stat-card:nth-child(3) .stat-value{color:#bd7a13!important}.stat-card:nth-child(4) .stat-value{color:#1f5fd1!important}.stat-sub{font-size:11px}
+#viewDashboard>.container{grid-template-columns:minmax(0,1.3fr) minmax(300px,.7fr);gap:18px}.network-insights{grid-column:2!important}.allocation-panel{grid-column:1!important}.network-insights,.allocation-panel{border-radius:8px;padding:20px}.network-insights strong{font-size:38px}.allocation-heading{border-bottom:1px solid var(--border);padding-bottom:13px}.allocation-heading h2{font-size:15px}.operations-grid{grid-column:1/-1;gap:14px}.operation-card{border-radius:8px;padding:18px;min-height:118px}.operation-card strong{font-size:14px}.operation-card p{font-size:11px}.section-header{border-bottom:1px solid var(--border);padding-bottom:12px}.section-title{font-size:14px}.dashboard-tools{font-size:12px}.vlan-grid{gap:14px}.vlan-card{border-radius:8px}.vlan-card .vc-head{padding:16px 16px 10px}.vlan-card .vc-body{padding:0 16px 14px}.vlan-card .vc-ping{padding:12px 16px}.vc-subnet{font-size:11px}
+.btn-primary,.btn-scan{border-radius:6px}.btn-secondary,.btn-ghost,.theme-choice{border-radius:6px}.search-wrap input,.dashboard-tools select{border-radius:6px;height:34px}.detail-panel,.vlan-hero,.scan-panel{border-radius:8px}
+@media(max-width:1200px){body{padding-left:0}.workspace-sidebar{width:100%}#viewDashboard>.container{grid-template-columns:1fr}.network-insights,.allocation-panel{grid-column:1!important}.stats-bar{grid-template-columns:repeat(3,1fr)}}@media(max-width:700px){.stats-bar{grid-template-columns:repeat(2,1fr)}.container{padding:20px 16px}.overview-heading{display:block}.time-panel{text-align:left;margin-top:14px}.operations-grid{grid-template-columns:1fr}}
+/* CoreUI-inspired admin treatment */
+.workspace-sidebar{background:#3c4b64;border-right:0}.workspace-brand{font-weight:700}.workspace-links{border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:14px}.workspace-sidebar button{border-radius:4px}.workspace-sidebar button.selected{background:#321fdb}.sidebar-footer{color:#e2e8f0}
+#appHeader{box-shadow:0 1px 2px rgba(0,0,0,.08)}.overview-heading h1{font-size:24px}.eyebrow{color:#321fdb;font-weight:700}.stat-card{border-radius:6px;box-shadow:0 1px 3px rgba(60,75,100,.12);border-top:3px solid #321fdb}.stat-card:nth-child(2){border-top-color:#2eb85c}.stat-card:nth-child(3){border-top-color:#f9b115}.stat-card:nth-child(4){border-top-color:#e55353}.stat-card:nth-child(5){border-top-color:#39f}.network-insights,.allocation-panel,.operation-card,.vlan-card{border-radius:6px;box-shadow:0 1px 3px rgba(60,75,100,.12)}.btn-primary,.btn-scan{background:#321fdb;border-color:#321fdb;border-radius:4px}.btn-secondary,.btn-ghost,.theme-choice{border-radius:4px}.vlan-card:hover{transform:none;box-shadow:0 3px 10px rgba(60,75,100,.18)}
+/* Restored dashboard view used in the earlier morning build. */
+:root[data-theme=dark]{--bg:#0f1117;--surface:#191d27;--surface2:#202636;--border:#30384b;--accent:#4f8ef7;--accent2:#3c75dc;--text:#eef2fb;--muted:#95a0b5;--good:#36c985;--warn:#f3b53f;--shadow:0 4px 16px rgba(0,0,0,.2)}
+:root[data-theme=dark] body{background:#0f1117;color:var(--text)}:root[data-theme=dark] #appHeader{background:#191d27;border-color:#30384b}.container{max-width:960px;padding:24px 22px}.overview-heading{border:0;padding-bottom:8px}.overview-heading h1{font-size:25px}.stats-bar{gap:10px}.stat-card{background:var(--surface);border-color:var(--border);border-top:1px solid var(--border);border-radius:9px;padding:16px}.stat-value{font-size:27px;color:var(--text)!important}.network-insights,.allocation-panel,.operation-card,.vlan-card{background:var(--surface);border-color:var(--border);box-shadow:none}.vlan-card{border-radius:9px}.vlan-card:hover{box-shadow:0 5px 16px rgba(0,0,0,.25)}
+/* Mobbin-inspired usability refinements */
+.workspace-sidebar button{display:flex;align-items:center;gap:10px;text-align:left}.workspace-sidebar button span{width:18px;text-align:center;opacity:.85}.workspace-sidebar button.selected span{opacity:1}.operation-card .all-scan-heading{display:flex;justify-content:space-between;gap:16px}.operation-card .all-scan-heading p{margin-top:5px;color:var(--muted)}.section-header{display:flex;align-items:center;justify-content:space-between;gap:16px}.search-wrap{min-width:220px}.vlan-card{overflow:hidden}.vlan-card .vc-head{display:flex;align-items:center;justify-content:space-between}.vc-freshness{color:var(--muted)}
+@media(max-width:700px){.workspace-sidebar{display:flex;overflow:auto;padding:10px;gap:8px}.workspace-brand,.sidebar-section-label,.sidebar-footer{display:none}.workspace-links,.workspace-vlans{display:flex;gap:5px;border:0;padding:0;margin:0}.workspace-sidebar button{white-space:nowrap;padding:0 11px}.workspace-vlans button{min-width:auto}.section-header{display:block}.search-wrap{margin-top:10px;width:100%}}

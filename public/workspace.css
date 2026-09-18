@@ -1,0 +1,80 @@
+/* Linear-inspired workspace presentation. Functional styles live in style.css. */
+:root,:root[data-theme=dark] { --bg:#0b0c0e;--surface:#121316;--surface2:#1b1c20;--border:#28292f;--accent:#a29bfe;--accent2:#8274e8;--text:#eeeff2;--muted:#9698a3;--shadow:none;--radius:8px; }
+:root[data-theme=light] { --bg:#fafafa;--surface:#fff;--surface2:#f0f0f3;--border:#e2e2e8;--accent:#6556c9;--accent2:#7665d6;--text:#23232a;--muted:#71717c; }
+:root[data-theme=ocean] { --bg:#0a171d;--surface:#0e2029;--surface2:#17303b;--border:#29414b;--accent:#7bcbda;--accent2:#60b2c2;--text:#e7f1f4;--muted:#99afb8; }
+body { padding-left:216px;font-family:Inter,'Segoe UI',sans-serif;font-size:15px;-webkit-font-smoothing:antialiased; }
+.workspace-sidebar { position:fixed;inset:0 auto 0 0;width:216px;background:var(--surface);border-right:1px solid var(--border);padding:24px 12px 16px;display:flex;flex-direction:column;z-index:110;overflow-y:auto; }
+.workspace-brand { display:flex;gap:10px;align-items:center;padding:0 10px 30px;font-weight:650;font-size:16px;letter-spacing:-.4px; }
+.brand-symbol { width:30px;height:30px;background:var(--text);color:var(--bg);border-radius:8px;display:grid;place-items:center;font-size:23px; }
+.workspace-brand small,.sidebar-footer small { display:block;font-size:12px;color:var(--muted);font-weight:400;letter-spacing:0;margin-top:2px; }
+.workspace-sidebar button { width:100%;display:flex;align-items:center;gap:10px;padding:9px 11px;margin-bottom:3px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:14px;border-radius:6px;text-align:left;cursor:pointer; }
+.workspace-sidebar button:hover,.workspace-sidebar button.selected { background:var(--surface2);color:var(--text); }
+.workspace-links button>span { width:18px;font-size:18px;text-align:center; }
+.sidebar-section-label { margin:28px 12px 12px;font-size:10px;letter-spacing:1.4px;color:var(--muted);font-weight:600; }
+.network-dot { width:7px;height:7px;border-radius:50%;flex:none; }
+.workspace-vlans button small { margin-left:auto;font:12px ui-monospace,monospace;color:var(--muted); }
+.sidebar-footer { display:flex;gap:10px;align-items:center;margin-top:auto;padding:24px 10px 0;font-size:12px; }
+.appliance-mark { border:1px solid var(--border);border-radius:7px;width:28px;height:28px;display:grid;place-items:center; }
+#appHeader { min-height:66px;padding:12px 32px;background:var(--bg);border-bottom:1px solid var(--border); }
+#appHeader .logo svg,#appHeader .logo-sub { display:none; }
+#appHeader .logo-text { font-size:14px;color:var(--muted);font-weight:500; }
+#appHeader .logo-text:after { content:' / Network operations'; }
+.container { padding:32px; }
+#viewDashboard>.container { gap:24px; }
+.overview-heading { padding:12px 0 8px; }
+.eyebrow { font-size:10px;letter-spacing:1.8px;color:var(--muted); }
+h1 { font-size:clamp(32px,3vw,48px);line-height:1.14;letter-spacing:-1.8px;font-weight:600;margin:14px 0; }
+.heading-muted { color:var(--muted); }
+.overview-heading p { font-size:14px;color:var(--muted); }
+.update-chip { background:transparent;border-radius:6px;font-size:12px; }
+.btn,.btn-sm,.theme-choice,.dashboard-tools select,.btn-back { border-radius:6px;min-height:34px;font-size:13px;padding:7px 12px;box-shadow:none; }
+.btn-primary,.btn-scan { background:var(--text);color:var(--bg);border:1px solid var(--text); }
+.btn-primary:hover,.btn-scan:hover { background:var(--text);filter:brightness(.9); }
+.btn-secondary,.btn-ghost,.theme-choice { background:var(--surface);border:1px solid var(--border);color:var(--text); }
+.stats-bar { gap:0;border:1px solid var(--border);border-radius:9px;overflow:hidden;background:var(--surface); }
+.stat-card { border:none;border-radius:0;border-right:1px solid var(--border);padding:22px 24px;background:transparent;box-shadow:none;gap:8px; }
+.stat-card:last-child { border-right:none; }
+.stat-label { min-height:0;text-transform:none;letter-spacing:0;font-size:13px;font-weight:500; }
+.stat-value { color:var(--text)!important;font-size:32px;font-weight:550;margin:5px 0;letter-spacing:-1px; }
+.stat-sub { font-size:12px; }
+.network-insights { background:var(--surface);border-radius:8px;padding:20px;box-shadow:none; }
+#networkInsights { padding:16px 20px; }
+.network-insights strong { font-size:20px; }
+.network-insights p { font-size:13px; }
+.coverage-track { height:4px; }
+.coverage-track span { background:var(--accent); }
+.operation-card strong { font-size:16px;font-weight:600; }
+.operation-card .btn { min-height:34px; }
+.operation-card>label { font-size:12px; }
+.operation-card>p { font-size:13px; }
+.operations-grid { gap:16px; }
+.section-title { font-size:16px;font-weight:550; }
+.dashboard-tools { padding:12px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border); }
+.dashboard-tools label,.dashboard-tools>span { font-size:12px; }
+input[type=search] { background:var(--surface);border-color:var(--border);font-size:13px;min-height:34px; }
+.vlan-grid { gap:14px;grid-template-columns:repeat(auto-fill,minmax(285px,1fr)); }
+.vlan-card { border-radius:8px;background:var(--surface);box-shadow:none; }
+.vlan-card:hover { transform:none;box-shadow:none;background:var(--surface2);border-color:var(--muted); }
+.vc-stripe { height:2px;opacity:.65; }
+.vc-name { font-size:16px;font-weight:600; }
+.vc-vlan-badge { font-size:11px;border-radius:5px;background:transparent; }
+.vc-body { padding:18px;gap:12px; }
+.vc-subnet { background:transparent;border:0;padding:0;color:var(--muted);font-size:13px; }
+.vc-subnet svg { color:var(--muted); }
+.vc-stats { gap:8px; }
+.vc-stat { border:none;padding:0;background:transparent;font-size:12px;font-weight:400; }
+.vc-bar-labels { font-size:12px; }
+.vc-bar-fill { background:var(--accent); }
+.vc-ping { padding:12px 18px;background:transparent; }
+.vc-freshness { background:transparent;padding:10px 18px;font-size:11px; }
+.vc-arrow { display:none; }
+.detail-panel,.vlan-hero,.scan-panel { border-radius:8px;box-shadow:none; }
+.ftab.active,.view-btn.active { background:var(--surface2);color:var(--text);border-color:var(--border); }
+.table-wrap th { background:var(--surface);text-transform:none;font-size:13px;font-weight:500; }
+.table-wrap td { font-size:14px!important; }
+.badge,.ping-badge { border-radius:5px;font-weight:500; }
+.workspace-links,.section-header,.operation-card,.overview-heading { scroll-margin-top:88px; }
+@media(min-width:1700px) { .container{padding:36px 40px;}#appHeader{padding-inline:40px;} }
+@media(max-width:1100px) { body{padding-left:184px;}.workspace-sidebar{width:184px;}.container{padding:24px;}#appHeader{padding:12px 24px;flex-wrap:wrap;}.stat-card{padding:18px 14px;}.operations-grid{grid-template-columns:1fr;} }
+@media(max-width:800px) { body{padding-left:0;}.workspace-sidebar{position:static;width:100%;padding:12px 18px;border-right:0;border-bottom:1px solid var(--border);}.workspace-brand{padding:0 0 12px;}.workspace-links{display:flex;flex-wrap:wrap;gap:4px;}.workspace-links button{width:auto;font-size:12px;}.workspace-vlans,.sidebar-section-label,.sidebar-footer{display:none;}#appHeader{position:static;}.container{padding:22px 18px;}.stat-card{border-bottom:1px solid var(--border);}.stats-bar{grid-template-columns:repeat(2,minmax(0,1fr));}.stat-card:last-child{border-bottom:none;}.overview-heading{align-items:flex-start;} }
+@media(max-width:540px) { .vlan-grid{grid-template-columns:1fr;}.header-actions{gap:6px;}.header-actions .btn,.theme-choice{font-size:12px;}.container{padding:20px 16px;}h1{font-size:34px;}.stat-value{font-size:28px;}.operation-card .all-scan-heading{grid-template-columns:1fr;} }

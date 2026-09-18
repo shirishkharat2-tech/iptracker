@@ -225,11 +225,8 @@ function parseOutput(raw) {
 
 async function pingOne(ip, settings) {
   try {
-    // Routed ICMP errors can arrive later than replies from the local subnet.
-    const routed = !isDirectlyConnected(ip);
-    const raw    = await pingRaw(ip,
-      routed ? Math.max(3000, settings.pingTimeout) : settings.pingTimeout,
-      routed ? Math.max(2, settings.pingRetries) : settings.pingRetries);
+    // Honor the configured timeout and retries equally for every VLAN.
+    const raw = await pingRaw(ip, settings.pingTimeout, settings.pingRetries);
     const parsed = parseOutput(raw);
 
     let hostname = null;
@@ -349,6 +346,7 @@ app.get('/api/vlans', (req, res) => {
 });
 
 // ── API: Entries CRUD ──────────────────────────────────────────────
+require('./sophos-sync').installSophosSync(app, {vlans:VLANS, inSubnet:isInSubnet, db:DB});
 app.get('/api/entries', (req, res) => {
   let data = readJSON(DB, []);
   if (req.query.vlanId) data = data.filter(e => e.vlanId === +req.query.vlanId);
@@ -383,6 +381,7 @@ app.put('/api/entries/:id', (req, res) => {
   const data = readJSON(DB, []);
   const idx  = data.findIndex(e => e.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'Entry not found.' });
+  if (data[idx].source === 'sophos') return res.status(409).json({error:'Manage this reservation in Sophos, then sync.'});
 
   const { vlanId, ip, host, status, type, mac, notes } = req.body;
   const vlan = VLANS.find(v => v.id === +(vlanId || data[idx].vlanId));
@@ -409,6 +408,7 @@ app.put('/api/entries/:id', (req, res) => {
 
 app.delete('/api/entries/:id', (req, res) => {
   const data     = readJSON(DB, []);
+  if (data.find(e => e.id === req.params.id)?.source === 'sophos') return res.status(409).json({error:'Manage this reservation in Sophos, then sync.'});
   const filtered = data.filter(e => e.id !== req.params.id);
   if (filtered.length === data.length) return res.status(404).json({ error: 'Entry not found.' });
   writeJSON(DB, filtered);
@@ -514,11 +514,10 @@ app.post('/api/scan', async (req, res) => {
     return record;
   });
 
-  // Avoid flooding the gateway with probes: ICMP error replies may be throttled.
-  const hasRoutedTargets = targetVlans.some(v => !isDirectlyConnected(v.subnet));
+  // Honor the configured parallelism for local and routed VLANs alike.
   const concurrency = Math.max(1, Math.min(
     Number(settings.concurrency) || DEFAULT_SETTINGS.concurrency,
-    hasRoutedTargets ? 3 : 100
+    100
   ));
   await runWithConcurrency(tasks, concurrency, () => {});
 
@@ -555,6 +554,7 @@ app.get('/api/scan/stream', (req, res) => {
 });
 
 // ── Catch-all → SPA ───────────────────────────────────────────────
+require('./network-time').installNetworkTime(app);
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });

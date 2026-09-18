@@ -5,8 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IP Tracker — Network VLAN Manager</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="workspace.css" />
+  <link rel="stylesheet" href="analytics.css" />
+  <script src="theme.js"></script>
 </head>
 <body>
+<aside class="workspace-sidebar" aria-label="Workspace navigation">
+  <div class="workspace-brand"><span class="brand-symbol" aria-hidden="true">◈</span><div>IP Tracker<small>Network workspace</small></div></div>
+  <nav class="workspace-links" aria-label="Main navigation">
+    <button data-workspace="overview" class="selected"><span aria-hidden="true">▦</span> Overview</button>
+    <button data-workspace="vlans"><span aria-hidden="true">▤</span> VLAN inventory</button>
+    <button data-workspace="sophos"><span aria-hidden="true">↻</span> Sophos integration</button>
+    <button data-workspace="scans"><span aria-hidden="true">⌁</span> Network scans</button>
+  </nav>
+  <div class="sidebar-section-label">YOUR NETWORKS</div>
+  <nav id="workspaceVlans" class="workspace-vlans" aria-label="VLAN shortcuts"></nav>
+  <div class="sidebar-footer"><span class="appliance-mark">S</span><div>Sophos XGS 2300<small>Read-only integration</small></div></div>
+</aside>
 
 <!-- ════════════════════════════════════════════════════════════════
      HEADER
@@ -40,6 +55,10 @@
   </div>
 
   <div class="header-actions">
+    <select id="themeChoice" class="theme-choice" aria-label="Color theme">
+      <option value="system">System theme</option><option value="light">Light</option><option value="dark">Midnight</option><option value="ocean">Ocean</option>
+    </select>
+    <button class="btn btn-secondary btn-sm" id="refreshData">Refresh data</button>
     <button class="btn btn-ghost btn-sm" id="settingsBtn" title="Scan Settings">
       <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="3"/>
@@ -72,6 +91,31 @@
   <div class="container">
 
     <!-- Global stats -->
+    <section class="overview-heading">
+      <div><div class="eyebrow">NETWORK WORKSPACE</div><h1 id="aitGreeting">Welcome, AIT</h1><p>Here’s what’s happening across your network today.</p></div>
+      <div class="time-panel"><time id="aitClock">Connecting to network time…</time><span id="timeSource">Checking NTP</span></div>
+      <div class="update-chip" id="dataUpdated" role="status">Loading network data…</div>
+    </section>
+    <section class="network-insights" id="networkInsights" aria-label="Scan coverage"></section>
+    <section class="allocation-panel" aria-label="VLAN assignment overview"><div class="allocation-heading"><div><h2>VLAN assignment overview</h2><p>Configured assignments as a share of usable IP space</p></div><span class="chart-key"><i></i> Assigned / reserved</span></div><div id="allocationChart"></div></section>
+    <div class="operations-grid">
+    <section class="network-insights operation-card" aria-label="Sophos reservations">
+      <div class="all-scan-heading"><div><strong>Sophos reservations</strong><p>IP, MAC and hostname from 192.168.1.1 · Read-only firewall connection</p></div>
+        <button class="btn btn-primary" id="sophosSync">Sync Now</button></div>
+      <p id="sophosStatus" role="status">Checking Sophos sync…</p>
+      <label><input type="checkbox" id="sophosAuto"> Automatically sync every 1 hour while the server is running</label>
+      <details id="sophosIssues" hidden><summary>Items needing review</summary><p id="sophosIssueText"></p></details>
+    </section>
+    <section class="network-insights operation-card" aria-label="Scan all VLAN IPs">
+      <div class="all-scan-heading">
+        <div><strong>Scan all VLAN IPs</strong><p>Check every configured VLAN using your scan settings.</p></div>
+        <button class="btn btn-scan" id="scanAllVlans">Scan All VLAN IPs</button>
+      </div>
+      <p id="allScanStatus" role="status">Checking scan status…</p>
+      <div class="coverage-track" id="allScanTrack" role="progressbar" aria-label="All VLAN scan progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="allScanFill" style="width:0%"></span></div>
+      <p id="allScanResults"></p>
+    </section>
+    </div>
     <div class="stats-bar" id="statsBar">
       <div class="stat-card skeleton"></div>
       <div class="stat-card skeleton"></div>
@@ -98,6 +142,11 @@
     </div>
 
     <!-- VLAN cards grid -->
+    <div class="dashboard-tools">
+      <label>Show <select id="vlanScope"><option value="all">All VLANs</option><option value="spare">With spare IPs</option><option value="timeout">With timeouts</option><option value="unscanned">Never scanned</option></select></label>
+      <label>Sort <select id="vlanSort"><option value="id">VLAN number</option><option value="spare">Most spare IPs</option><option value="timeout">Most timeouts</option><option value="name">Name</option></select></label>
+      <span id="vlanCount"></span>
+    </div>
     <div class="vlan-grid" id="vlanGrid"></div>
 
   </div>
@@ -288,7 +337,7 @@
       <div class="form-group">
         <label class="form-label">Concurrency (parallel pings)</label>
         <input type="number" id="sConcurrency" class="form-control" min="1" max="100" />
-        <div class="form-hint">How many IPs to ping simultaneously. Default: 30. Routed VLANs use at most 3 parallel probes, at least 3000 ms timeout and 2 retries to allow delayed gateway replies.</div>
+        <div class="form-hint">How many IPs to ping simultaneously across any VLAN. Default: 30. Reduce this if your gateway drops ping replies under load.</div>
       </div>
       <div class="form-group">
         <label class="form-label">Ping Retries</label>
@@ -306,5 +355,9 @@
 
 <div id="toastContainer"></div>
 <script src="app.js"></script>
+<script src="dashboard.js"></script>
+<script src="sophos.js"></script>
+<script src="workspace.js"></script>
+<script src="analytics.js"></script>
 </body>
 </html>

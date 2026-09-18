@@ -76,6 +76,7 @@ async function loadAll() {
     apiFetch('/api/ping-results'),
     apiFetch('/api/settings'),
   ]);
+  document.getElementById('dataUpdated').textContent = `Updated ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
 }
 
 // ── Format helpers ────────────────────────────────────────────────
@@ -119,6 +120,7 @@ function showDashboard() {
 function showVlanDetail(vlanId) {
   activeVlan = vlans.find(v => v.id === vlanId);
   if (!activeVlan) return;
+  if (window.updateWorkspace) window.updateWorkspace();
 
   ipFilter   = 'all';
   ipView     = 'table';
@@ -149,6 +151,8 @@ function renderDashboard() {
 }
 
 function renderGlobalStats() {
+  if (window.renderAllocationChart) window.renderAllocationChart();
+  if (window.updateWorkspace) window.updateWorkspace();
   const totalUsable = vlans.reduce((s, v) => s + v.usable, 0);
   const totalUsed   = entries.filter(e => e.status === 'used').length;
   const totalRes    = entries.filter(e => e.status === 'reserved').length;
@@ -160,6 +164,13 @@ function renderGlobalStats() {
   const pingUsed    = allPR.filter(r => r.pingStatus === 'used').length;
   const pingTimeout = allPR.filter(r => r.pingStatus === 'timeout').length;
   const pingSpare   = allPR.filter(r => r.pingStatus === 'spare').length;
+  const scanCapacity = vlans.reduce((sum, v) => sum + v.usable - 1, 0);
+  const scannedCount = vlans.reduce((sum, v) => sum + v.pingScanned, 0);
+  const coverage = scanCapacity ? Math.round(scannedCount / scanCapacity * 100) : 0;
+  document.getElementById('networkInsights').innerHTML = `
+    <div><span class="eyebrow">SCAN COVERAGE</span><strong>${coverage}%</strong><span>${fmtNumber(scannedCount)} of ${fmtNumber(scanCapacity)} scan targets checked</span></div>
+    <div class="coverage-track" role="progressbar" aria-label="Scan coverage" aria-valuenow="${coverage}" aria-valuemin="0" aria-valuemax="100"><span style="width:${coverage}%"></span></div>
+    <p>${vlans.filter(v => !v.pingScanned).length} VLANs never scanned · Spare means an unreachable reply was received. Timeout means availability is unknown.</p>`;
 
   document.getElementById('statsBar').innerHTML = `
     <div class="stat-card">
@@ -168,22 +179,22 @@ function renderGlobalStats() {
       <div class="stat-sub">across ${vlans.length} VLANs</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">🔴 Ping: Used</div>
-      <div class="stat-value" style="color:#f87171">${fmtNumber(pingUsed)}</div>
+      <div class="stat-label">Responding IPs</div>
+      <div class="stat-value" style="color:var(--red)">${fmtNumber(pingUsed)}</div>
       <div class="stat-sub">replied to ping</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">🟡 Ping: Timeout</div>
+      <div class="stat-label">No response</div>
       <div class="stat-value c-yellow">${fmtNumber(pingTimeout)}</div>
       <div class="stat-sub">ICMP blocked / no reply</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">🟢 Ping: Spare</div>
+      <div class="stat-label">Spare IPs</div>
       <div class="stat-value c-green">${fmtNumber(pingSpare)}</div>
       <div class="stat-sub">host unreachable</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Manually Assigned</div>
+      <div class="stat-label">Assigned / Reserved</div>
       <div class="stat-value c-purple">${fmtNumber(totalUsed+totalRes)}</div>
       <div class="stat-sub">${pct}% of space assigned</div>
     </div>
@@ -192,16 +203,21 @@ function renderGlobalStats() {
 
 function renderVlanCards() {
   const q = (document.getElementById('vlanSearch').value || '').toLowerCase();
-  const list = vlans.filter(v =>
+  let list = vlans.filter(v =>
     v.name.toLowerCase().includes(q) ||
     String(v.id).includes(q) ||
     v.subnet.includes(q)
   );
+  const scope = document.getElementById('vlanScope').value;
+  list = list.filter(v => scope === 'all' || (scope === 'spare' && v.pingSpare > 0) || (scope === 'timeout' && v.pingTimeout > 0) || (scope === 'unscanned' && !v.pingScanned));
+  const sort = document.getElementById('vlanSort').value;
+  list.sort((a, b) => sort === 'name' ? a.name.localeCompare(b.name) : sort === 'spare' ? b.pingSpare - a.pingSpare : sort === 'timeout' ? b.pingTimeout - a.pingTimeout : a.id - b.id);
+  document.getElementById('vlanCount').textContent = `${list.length} of ${vlans.length} VLANs`;
 
   if (!list.length) {
     document.getElementById('vlanGrid').innerHTML = `
       <div class="empty" style="grid-column:1/-1">
-        <p>No VLANs match "<strong>${q}</strong>"</p>
+        <p>No VLANs match your search and filters.</p>
       </div>`;
     return;
   }
@@ -219,12 +235,12 @@ function renderVlanCards() {
           <div class="vc-ping-item"><div class="vc-ping-dot" style="background:#f87171"></div><span class="vc-ping-val">${v.pingUsed}</span><span>used</span></div>
           <div class="vc-ping-item"><div class="vc-ping-dot" style="background:#f59e0b"></div><span class="vc-ping-val">${v.pingTimeout}</span><span>timeout</span></div>
           <div class="vc-ping-item"><div class="vc-ping-dot" style="background:#22c55e"></div><span class="vc-ping-val">${v.pingSpare}</span><span>spare</span></div>
-          <span class="vc-ping-note">${v.pingScanned}/${v.usable} scanned</span>
+          <span class="vc-ping-note">${v.pingScanned}/${v.usable - 1} scan targets</span>
         </div>`;
     }
 
     return `
-    <div class="vlan-card" style="--vc:${v.color}" data-vid="${v.id}">
+    <div class="vlan-card" style="--vc:${v.color}" data-vid="${v.id}" role="button" tabindex="0" aria-label="Open VLAN ${v.id}, ${v.name}">
       <div class="vc-stripe"></div>
       <div class="vc-body">
         <div class="vc-top">
@@ -238,7 +254,7 @@ function renderVlanCards() {
         <div class="vc-stats">
           <div class="vc-stat"><div class="vc-stat-dot" style="background:var(--green)"></div>${v.used} used</div>
           <div class="vc-stat"><div class="vc-stat-dot" style="background:var(--yellow)"></div>${v.reserved} reserved</div>
-          <div class="vc-stat"><div class="vc-stat-dot" style="background:var(--muted)"></div>${Math.max(0,v.spare)} spare</div>
+          <div class="vc-stat"><div class="vc-stat-dot" style="background:var(--muted)"></div>${Math.max(0,v.spare)} unassigned</div>
         </div>
         <div class="vc-bar">
           <div class="vc-bar-labels">
@@ -251,6 +267,7 @@ function renderVlanCards() {
         </div>
       </div>
       ${pingSection}
+      <div class="vc-freshness">${v.lastScanned ? `Latest result · ${fmtDateTime(new Date(v.lastScanned).toISOString())}` : 'No scan results yet'}</div>
       <svg class="vc-arrow" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
         <polyline points="9 18 15 12 9 6"/>
       </svg>
@@ -328,6 +345,7 @@ function renderDetail() {
     // Effective display status (for filter tabs)
     let status;
     if (sys)             status = sys;
+    else if (entry?.source === 'sophos') status = 'reserved';
     else if (pr)         status = pr.pingStatus;   // ping-derived
     else if (entry)      status = entry.status;    // manually assigned
     else                 status = 'unscanned';
@@ -367,6 +385,8 @@ function renderDetail() {
     <button class="ftab ${ipFilter==='timeout' ?'active':''}" data-f="timeout">🟡 Timeout <span style="opacity:.55">${cTimeout}</span></button>
     <button class="ftab ${ipFilter==='spare'   ?'active':''}" data-f="spare">🟢 Spare <span style="opacity:.55">${cSpare}</span></button>
     <button class="ftab ${ipFilter==='reserved'?'active':''}" data-f="reserved">Reserved <span style="opacity:.55">${cRes}</span></button>
+    <button class="ftab ${ipFilter==='unscanned'?'active':''}" data-f="unscanned">Unscanned <span style="opacity:.55">${usable.filter(r => !r.pr).length}</span></button>
+    <button class="ftab ${ipFilter==='sophos'?'active':''}" data-f="sophos">Sophos <span style="opacity:.55">${usable.filter(r => r.entry?.source === 'sophos').length}</span></button>
   `;
 
   if (ipView === 'grid') renderGrid(rows, info);
@@ -379,7 +399,7 @@ function filterRows(rows) {
 
   // Status filter (skip sys addresses unless showing all)
   if (ipFilter !== 'all') {
-    out = out.filter(r => !r.sys && r.status === ipFilter);
+    out = out.filter(r => !r.sys && (ipFilter === 'sophos' ? r.entry?.source === 'sophos' : ipFilter === 'unscanned' ? !r.pr : r.status === ipFilter));
   }
 
   // Search
@@ -426,7 +446,7 @@ function renderTable(rows, info) {
         <tbody>
           ${filtered.map(r => {
             const num = ipToInt(r.ip) - info.base + 1;
-            const hostname = r.entry?.host || r.pr?.hostname || '';
+            const hostname = escapeText(r.entry?.host || r.pr?.hostname || '');
             return `<tr>
               <td class="td-num">${num}</td>
               <td class="td-ip">${r.ip}</td>
@@ -435,7 +455,7 @@ function renderTable(rows, info) {
               <td>${r.pr?.responseTime ? `<span class="resp-time">${r.pr.responseTime}</span>` : '<span class="resp-dash">—</span>'}</td>
               <td class="td-muted" style="font-size:.73rem;white-space:nowrap">${r.pr ? fmtTime(r.pr.checkedAt) : '—'}</td>
               <td class="td-trunc" style="font-size:.82rem">${hostname || '<span class="td-muted">—</span>'}</td>
-              <td>${r.entry ? assignedBadge(r.entry.status) : '<span class="td-muted">—</span>'}</td>
+              <td>${r.entry?.source === 'sophos' ? `<span class="badge b-reserved">${r.entry.sourceState === 'missing' ? 'Sophos · Review removal' : 'Assigned in Sophos'}</span>` : r.entry ? assignedBadge(r.entry.status) : '<span class="td-muted">—</span>'}</td>
               <td class="td-muted">${r.entry?.type || '—'}</td>
               <td class="td-mono">${r.entry?.mac || (r.pr?.mac ? `<span style="color:var(--muted)">${r.pr.mac}</span>` : '—')}</td>
               <td>
@@ -443,7 +463,7 @@ function renderTable(rows, info) {
                   ${!r.sys ? `<button class="btn-icon btn-sm" title="Ping now" data-pingip="${r.ip}">
                     <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
                   </button>` : ''}
-                  ${r.entry ? `
+                  ${r.entry?.source === 'sophos' ? '<span class="td-muted">Managed in Sophos</span>' : r.entry ? `
                     <button class="btn-icon" title="Edit" data-edit="${r.entry.id}">
                       <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                     </button>
@@ -471,10 +491,10 @@ function renderGrid(rows, info) {
 
   const blocks = filtered.map(r => {
     const last = r.ip.split('.').pop();
-    const cls  = r.sys || (r.pr ? r.pr.pingStatus : (r.entry ? r.entry.status : 'unscanned'));
-    const host = r.entry?.host || r.pr?.hostname || '';
+    const cls  = r.sys || (r.entry?.source === 'sophos' ? 'reserved' : r.pr ? r.pr.pingStatus : (r.entry ? r.entry.status : 'unscanned'));
+    const host = escapeText(r.entry?.host || r.pr?.hostname || '');
     const hostEl = host ? `<div class="ipb-host" title="${host}">${host}</div>` : '';
-    const click  = r.entry ? `data-edit="${r.entry.id}"` :
+    const click  = r.entry?.source === 'sophos' ? '' : r.entry ? `data-edit="${r.entry.id}"` :
                    r.sys   ? '' : `data-assign="${r.ip}"`;
     const tip = `${r.ip}${host ? ' — '+host : ''}${r.pr ? ' ['+r.pr.pingStatus+']' : ''}`;
     return `<div class="ipb ${cls}" ${click} title="${tip}">.${last}${hostEl}</div>`;
@@ -497,6 +517,9 @@ function assignedBadge(status) {
   if (status === 'used')     return `<span class="badge b-used">Used</span>`;
   if (status === 'reserved') return `<span class="badge b-reserved">Reserved</span>`;
   return `<span class="badge b-spare">${status}</span>`;
+}
+function escapeText(value) {
+  return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 function sysBadge(cls) {
   if (cls === 'network')   return `<span class="badge b-network">Network</span>`;

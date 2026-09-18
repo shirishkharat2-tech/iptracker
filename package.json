@@ -4,7 +4,7 @@
   "description": "Network VLAN IP Tracker",
   "main": "server.js",
   "scripts": {
-    "build": "node --check server.js && node --check public/app.js",
+    "build": "node --check server.js && node --check sophos-sync.js && node --check network-time.js && node --check public/app.js && node --check public/theme.js && node --check public/dashboard.js && node --check public/sophos.js && node --check public/workspace.js && node --check public/analytics.js",
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
